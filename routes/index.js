@@ -1,36 +1,26 @@
-var express = require('express');
-const ytdl = require('ytdl-core');
+var express = require("express");
+const ytdl = require("ytdl-core");
 var router = express.Router();
-const fs = require('fs');
+const fs = require("fs");
+var getMp3forURL = require("../utils/video");
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get("/", function (req, res, next) {
+  res.render("index", { title: "Express" });
 });
 
-router.post('/yt', async (req, res, next) => {
-
-  await ytdl(req.body.url)
-    .pipe(fs.createWriteStream('video2.mp4'))
-  res.sendFile('video2.mp4', { root: '.' });
+router.post("/yt", async (req, res, next) => {
+  try {
+    const file = await getMp3forURL(req.body.url);
+    res.sendFile(file, { root: "." });
+  } catch (e) {
+    console.log("e", e);
+  }
 });
 
-router.get('/yt', async (req, res, next) => {
-  // console.log(req.body.url)
-  // await ytdl('https://www.youtube.com/watch?v=hDMg6lBsCAU')
-  //   .pipe(fs.createWriteStream('video2.mp4'))
-  res.sendFile('video2.mp4', { root: '.' });
+router.post("/yt-info", async (req, res, next) => {
+  let info = await ytdl.getBasicInfo(req.body.url);
+  res.send(info);
 });
-
-
-
-router.post('/yt-info', async (req, res, next) => {
-  let info = await ytdl.getInfo(req.body.url);
-  let audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
-  res.send(audioFormats);
-});
-
-
-
 
 module.exports = router;
