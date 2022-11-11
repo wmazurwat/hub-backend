@@ -54,4 +54,8 @@ const getMp3forURL = async (url) => {
   return mp3;
 };
 
-module.exports = getMp3forURL;
+module.exports = {
+  getMp3forURL,
+  getInfo,
+  getStream,
+};

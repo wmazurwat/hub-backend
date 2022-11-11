@@ -1,8 +1,9 @@
 var express = require("express");
+const ffmpeg = require("fluent-ffmpeg");
 const ytdl = require("ytdl-core");
 var router = express.Router();
-const fs = require("fs");
-var getMp3forURL = require("../utils/video");
+const fs = require("fs").promises;
+var { getMp3forURL, getInfo, getStream } = require("../utils/video");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -21,6 +22,23 @@ router.post("/yt", async (req, res, next) => {
 router.post("/yt-info", async (req, res, next) => {
   let info = await ytdl.getBasicInfo(req.body.url);
   res.send(info);
+});
+
+router.post("/yt-new", async (req, res, next) => {
+  const { url } = req.body;
+  res.contentType("audio/mpeg");
+  const stream = await getStream(url);
+  ffmpeg({ source: stream })
+    .format("mp3")
+    .audioBitrate("192k")
+    .on("end", function () {
+      console.log("file has been converted succesfully");
+    })
+    .on("error", function (err) {
+      console.log("an error happened: " + err.message);
+    })
+    // save to stream
+    .pipe(res, { end: true });
 });
 
 module.exports = router;
