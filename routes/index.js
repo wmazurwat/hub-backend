@@ -2,7 +2,7 @@ var express = require("express");
 const ffmpeg = require("fluent-ffmpeg");
 const ytdl = require("ytdl-core");
 var router = express.Router();
-const fs = require("fs").promises;
+
 var { getMp3forURL, getInfo, getStream } = require("../utils/video");
 
 /* GET home page. */
@@ -26,6 +26,7 @@ router.post("/yt-info", async (req, res, next) => {
 
 router.post("/yt-new", async (req, res, next) => {
   const { url } = req.body;
+  console.log("url", url);
   res.contentType("audio/mpeg");
   const stream = await getStream(url);
   ffmpeg({ source: stream })
