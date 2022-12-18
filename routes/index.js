@@ -1,8 +1,9 @@
 var express = require("express");
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg = require("fluent-ffmpeg");
 const ytdl = require("ytdl-core");
 var router = express.Router();
-
+ffmpeg.setFfmpegPath(ffmpegPath);
 var { getMp3forURL, getInfo, getStream } = require("../utils/video");
 
 /* GET home page. */
@@ -31,7 +32,7 @@ router.post("/yt-new", async (req, res, next) => {
   const stream = await getStream(url);
   ffmpeg({ source: stream })
     .format("mp3")
-    .audioBitrate("192k")
+    // .audioBitrate("192k")
     .on("end", function () {
       console.log("file has been converted succesfully");
     })
