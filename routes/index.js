@@ -25,14 +25,15 @@ router.post("/yt-info", async (req, res, next) => {
   res.send(info);
 });
 
-router.post("/yt-new", async (req, res, next, bitrate) => {
-  const { url } = req.body;
+router.post("/yt-new", async (req, res, next) => {
+  const { url, samplingRate = 128 } = req.body;
+  console.log("sr", samplingRate);
   console.log("url", url);
   res.contentType("audio/mpeg");
   const stream = await getStream(url);
   ffmpeg({ source: stream })
     .format("mp3")
-    .audioBitrate(bitrate)
+    .audioBitrate(samplingRate)
     .on("end", function () {
       console.log("file has been converted succesfully");
     })
